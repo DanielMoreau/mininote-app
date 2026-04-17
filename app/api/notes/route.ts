@@ -1,65 +1,35 @@
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 
-// GET
+// GET → récupérer toutes les notes
 export async function GET() {
   const notes = await prisma.note.findMany({
-    orderBy: { pinned: "desc" }
+    orderBy: [
+      { pinned: "desc" },      // notes épinglées en premier
+      { createdAt: "desc" }    // puis les plus récentes
+    ]
   });
 
   return Response.json(notes);
 }
 
-// POST
-export async function POST(req: Request) {
-  const body = await req.json();
+// POST → créer une note
+export async function POST(request: Request) {
+  const body = await request.json();
 
-  if (!body.content) {
-    return Response.json({ error: "Empty content" }, { status: 400 });
+  // sécurité minimale
+  if (!body.title) {
+    return new Response(JSON.stringify({ error: "Title is required" }), {
+      status: 400
+    });
   }
 
   const note = await prisma.note.create({
     data: {
-      content: body.content
+      title: body.title,
+      content: body.content || "",
+      pinned: body.pinned ?? false
     }
   });
 
   return Response.json(note);
-}
-
-// DELETE
-export async function DELETE(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-
-  if (!id) {
-    return Response.json({ error: "Missing id" }, { status: 400 });
-  }
-
-  await prisma.note.delete({
-    where: { id }
-  });
-
-  return Response.json({ success: true });
-}
-
-// PATCH
-export async function PATCH(req: Request) {
-  const body = await req.json();
-
-  if (!body.id) {
-    return Response.json({ error: "Missing id" }, { status: 400 });
-  }
-
-  const note = await prisma.note.findUnique({
-    where: { id: body.id }
-  });
-
-  await prisma.note.update({
-    where: { id: body.id },
-    data: {
-      pinned: !note?.pinned
-    }
-  });
-
-  return Response.json({ success: true });
 }
