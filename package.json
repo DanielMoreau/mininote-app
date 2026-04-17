@@ -1,0 +1,23 @@
+{
+  "name": "mininote-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "next": "16.2.3",
+    "prisma": "^5.22.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "typescript": "^5",
+    "vitest": "^1.6.1"
+  }
+}
